@@ -48,14 +48,43 @@
   }
   function ordinal(n) { n = parseInt(n, 10); var s = ["th", "st", "nd", "rd"], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
   var MILESTONE_FOR = { "Birthday": "birthday", "Wedding Anniversary": "anniversary" };
+  var MILESTONES = {
+    birthday: [
+      ["Baby (months)", ["1 month", "3 months", "6 months", "9 months"]],
+      ["Little ones", ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"]],
+      ["Grown-ups", ["13th", "16th", "18th", "21st", "25th", "30th", "40th", "50th", "60th", "75th", "Other age"]]
+    ],
+    anniversary: [
+      ["Anniversary", ["1st", "2nd", "3rd", "5th", "10th", "15th", "20th", "25th · Silver", "30th", "40th", "50th · Golden", "Other year"]]
+    ]
+  };
+  var msKind = null, msDraft = "";
+  function renderMilestones(kind) {
+    var keep = val("milestone") || msDraft; msDraft = "";
+    $("#milestoneGroups").innerHTML = MILESTONES[kind].map(function (g) {
+      return '<div class="ms-group"><p class="ms-group__label">' + esc(g[0]) + '</p><div class="chips chips--sm">' +
+        g[1].map(function (o) { return chip("milestone", o); }).join("") + "</div></div>";
+    }).join("");
+    if (keep) setRadio("milestone", keep);
+  }
+  function msIsOther(v) { return /^Other/.test(v || ""); }
   function updateMilestone() {
     var kind = MILESTONE_FOR[val("occasion")], fld = $("#milestoneField");
     fld.hidden = !kind;
-    if (!kind) { showErr("milestone", ""); return; }
-    $("#milestoneLabel").textContent = "Which " + kind + " is this?";
-    var n = parseInt(val("milestone"), 10);
-    $("#milestoneSuffix").textContent = (n > 0 ? ordinal(n).replace(/^\d+/, "") : "") + " " + kind;
-    $("#f_milestone").placeholder = kind === "birthday" ? "e.g. 1" : "e.g. 25";
+    if (!kind) { msKind = null; showErr("milestone", ""); return; }
+    if (kind !== msKind) { if (msKind) $("#milestoneGroups").innerHTML = ""; renderMilestones(kind); msKind = kind; }
+    $("#milestoneLabel").innerHTML = "Which " + kind + " is this? <b>*</b>";
+    var other = msIsOther(val("milestone"));
+    $("#milestoneOtherWrap").hidden = !other;
+    var n = parseInt(val("milestone_other"), 10);
+    $("#milestoneSuffix").textContent = (n > 0 ? ordinal(n).replace(/^\d+/, "") + " " : "") + kind;
+  }
+  function milestoneText() {
+    var kind = MILESTONE_FOR[val("occasion")], v = val("milestone");
+    if (!kind || !v) return "";
+    if (msIsOther(v)) { var n = parseInt(val("milestone_other"), 10); return n > 0 ? ordinal(n) + " " + kind : ""; }
+    if (/month/.test(v)) return v + (v === "6 months" ? " (half birthday)" : " (baby milestone)");
+    return v.replace(/ · .*/, "") + " " + kind + (/ · /.test(v) ? " (" + v.split(" · ")[1] + ")" : "");
   }
   function pad(n) { return String(n).padStart(2, "0"); }
   function ymd(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
@@ -83,7 +112,12 @@
   /* ─────────── Validation ─────────── */
   var RULES = [
     [0, "occasion", function (v) { return !!v; }, "Please choose the occasion."],
-    [0, "milestone", function (v) { return !MILESTONE_FOR[val("occasion")] || (+v >= 1 && +v <= 120 && Math.floor(+v) === +v); }, function () { return "Please tell us which " + MILESTONE_FOR[val("occasion")] + " it is (a number, e.g. 1 or 25)."; }],
+    [0, "milestone", function (v) {
+      if (!MILESTONE_FOR[val("occasion")]) return true;
+      if (!v) return false;
+      if (!msIsOther(v)) return true;
+      var n = +val("milestone_other"); return n >= 1 && n <= 120 && Math.floor(n) === n;
+    }, function (v) { var k = MILESTONE_FOR[val("occasion")]; return !v ? "Please choose which " + k + " it is." : "Please enter the number (e.g. 35)."; }],
     [0, "flavour", function (v) { return !!v; }, "Please choose a flavour."],
     [0, "weight", function (v) { return !!v; }, "Please choose the weight."],
     [0, "date", function (v) { return !!v && v >= dateInp.min && v <= dateInp.max; }, function (v) { return !v ? "Please choose the date you need the cake." : v < dateInp.min ? "Please choose " + prettyDate(dateInp.min) + " or later — we bake every cake fresh." : "Please choose a date within the next year."; }],
@@ -115,7 +149,7 @@
   }
   form.addEventListener("input", function (e) { if (e.target.name) showErr(e.target.name, ""); });
   form.addEventListener("change", function (e) { if (e.target.name) showErr(e.target.name, ""); updateHints(); updateMilestone(); save(); });
-  form.addEventListener("input", function (e) { if (e.target.name === "milestone") updateMilestone(); });
+  form.addEventListener("input", function (e) { if (e.target.name === "milestone_other") { updateMilestone(); showErr("milestone", ""); } });
 
   /* ─────────── Pages ─────────── */
   var steps = $$(".step", form), cur = 0;
@@ -156,7 +190,7 @@
     var d = {};
     Object.keys(LABELS).forEach(function (k) {
       var v = val(k); if (!v) return;
-      if (k === "milestone") { var kind = MILESTONE_FOR[val("occasion")]; if (!kind) return; v = ordinal(v) + " " + kind; }
+      if (k === "milestone") { v = milestoneText(); if (!v) return; }
       if (k === "date") v = prettyDate(v);
       if (k === "time") v = prettyTime(v);
       if (k === "phone") v = "+91 " + normPhone(v);
@@ -191,6 +225,7 @@
   function restore() {
     var o; try { o = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { o = null; }
     if (!o) return;
+    msDraft = o.milestone || "";
     Object.keys(o).forEach(function (n) {
       controls(n).forEach(function (el) {
         if (el.type === "radio") el.checked = el.value === o[n];

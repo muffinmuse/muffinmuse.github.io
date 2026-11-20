@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Manrope:wght@400;500;600;700&family=Pinyon+Script&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/img/hero.webp" fetchpriority="high">
-  <link rel="stylesheet" href="assets/css/styles.css?v=7">
+  <link rel="stylesheet" href="assets/css/styles.css?v=8">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -244,10 +244,11 @@
           </div>
 
           <div class="field" id="milestoneField" hidden>
-            <label for="f_milestone" id="milestoneLabel">Which birthday is this?</label>
-            <div class="milestone">
-              <input id="f_milestone" name="milestone" type="number" min="1" max="120" inputmode="numeric" placeholder="e.g. 1">
-              <span id="milestoneSuffix">st birthday</span>
+            <span class="field__label" id="milestoneLabel">Which birthday is this? <b>*</b></span>
+            <div id="milestoneGroups" role="radiogroup" aria-labelledby="milestoneLabel"></div>
+            <div class="milestone" id="milestoneOtherWrap" hidden>
+              <input id="f_milestone_other" name="milestone_other" type="number" min="1" max="120" inputmode="numeric" placeholder="e.g. 35" aria-label="Enter the number">
+              <span id="milestoneSuffix">birthday</span>
             </div>
             <p class="err" data-err="milestone"></p>
           </div>
@@ -405,8 +406,8 @@
 </dialog>
 
 
-<script src="assets/js/config.js?v=7"></script>
-<script src="assets/js/app.js?v=7" defer></script>
-<script src="assets/js/booking.js?v=7" defer></script>
+<script src="assets/js/config.js?v=8"></script>
+<script src="assets/js/app.js?v=8" defer></script>
+<script src="assets/js/booking.js?v=8" defer></script>
 </body>
 </html>

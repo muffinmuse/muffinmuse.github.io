@@ -307,7 +307,9 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--r
 .is-invalid input, .is-invalid select, .is-invalid textarea, input.is-invalid { border-color: var(--bad); background: #FFF7F6; }
 .err { color: var(--bad); font-size: .82rem; margin: 6px 0 0; min-height: 0; }
 .err:empty { display: none; }
-.milestone { display: flex; align-items: center; gap: 12px; }
+.ms-group + .ms-group { margin-top: 14px; }
+.ms-group__label { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.milestone { display: flex; align-items: center; gap: 10px; margin-top: 14px; }
 .milestone input { max-width: 140px; }
 .milestone span { font: italic 500 1.25rem/1 var(--serif); color: var(--rose-deep); }
 .phone { display: flex; align-items: stretch; }
