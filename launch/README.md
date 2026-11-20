@@ -16,7 +16,7 @@ To rebuild it, put the portrait photos in `img/`, then run:
 
 ```
 python music.py m3
-python render.py muffin-muse-launch.mp4 m3_full.wav "your-website-link"
+python render.py muffin-muse-launch.mp4 m3_full.wav "muffinmuse.github.io"
 ```
 
 `render.py` re-times the scenes defined in `render2.py`. You need Pillow, NumPy and imageio-ffmpeg installed.
