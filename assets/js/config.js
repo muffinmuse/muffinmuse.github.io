@@ -20,7 +20,7 @@ window.MM_CONFIG = {
      every booking is delivered. The activation email also gives you a
      random alias (e.g. "a1b2c3d4e5f6...") — paste it below instead of
      the plain address so the email is not visible in the page source. */
-  formEndpointId: "manish244504@gmail.com",
+  formEndpointId: "jammuu363@gmail.com",
 
   /* Minimum days of notice for an order (0 = same day, 1 = from tomorrow). */
   minLeadDays: 1,
