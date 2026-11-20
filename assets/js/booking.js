@@ -60,7 +60,7 @@
   };
   var msKind = null, msDraft = "";
   function renderMilestones(kind) {
-    var keep = val("milestone") || msDraft; msDraft = "";
+    var keep = msDraft; msDraft = "";  // fresh choice whenever the occasion type changes
     $("#milestoneGroups").innerHTML = MILESTONES[kind].map(function (g) {
       return '<div class="ms-group"><p class="ms-group__label">' + esc(g[0]) + '</p><div class="chips chips--sm">' +
         g[1].map(function (o) { return chip("milestone", o); }).join("") + "</div></div>";
@@ -72,7 +72,7 @@
     var kind = MILESTONE_FOR[val("occasion")], fld = $("#milestoneField");
     fld.hidden = !kind;
     if (!kind) { msKind = null; showErr("milestone", ""); return; }
-    if (kind !== msKind) { if (msKind) $("#milestoneGroups").innerHTML = ""; renderMilestones(kind); msKind = kind; }
+    if (kind !== msKind) { renderMilestones(kind); msKind = kind; $("#f_milestone_other").value = ""; }
     $("#milestoneLabel").innerHTML = "Which " + kind + " is this? <b>*</b>";
     var other = msIsOther(val("milestone"));
     $("#milestoneOtherWrap").hidden = !other;
